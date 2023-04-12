@@ -1,4 +1,8 @@
-//**** add 2 buttons and 2 lights
+//**** add 1 button and 1 light
+// Note: Deleted the flash portion because traffic lights dont flash before they change
+//       Additonally, the code was causing a ton of unintended behavior so it got scrapped 
+//       Updated to use more complex logic because apparently functional isn't good enough
+//       Check github https://github.com/ColtonKelsen/Project5Micro2
 #define westButton 3
 #define eastButton 13
 #define westRed 2
@@ -8,12 +12,12 @@
 #define eastYellow 11
 #define eastGreen 10
 #define pedButton 9
-#define yellowBlinkTime 500
 #define pedLight 8
 
 boolean trafficWest = true; // west = true, east = false
-int flowTime = 10000;
-int changeDelay = 2000;
+int flowTime = 4000;
+int changeDelay = 1000;
+int pedFlowTime = 4000;
 
 
 
@@ -55,13 +59,6 @@ void loop()
       digitalWrite(eastYellow, LOW);
       digitalWrite(eastRed, HIGH);
       delay(changeDelay);
-      for ( int a = 0; a < 5; a++)
-      {
-        digitalWrite(westYellow, LOW);
-        delay(yellowBlinkTime);
-        digitalWrite(westYellow, HIGH);
-        delay(yellowBlinkTime);
-      }
       digitalWrite(westYellow, LOW);
       digitalWrite(westRed, LOW);
       digitalWrite(westGreen, HIGH);
@@ -70,9 +67,26 @@ void loop()
   }
   if (digitalRead(pedButton) == HIGH)
   {
-      trafficWest = false;
+     if ( trafficWest != true)
+    { 
       delay(changeDelay);
+      digitalWrite(eastGreen, LOW);
+      digitalWrite(eastYellow, HIGH);
+      delay(changeDelay);
+      digitalWrite(eastYellow, LOW);
+      digitalWrite(eastRed, HIGH);
+      delay(changeDelay);// East goes red
 
+
+
+
+
+
+
+    }
+    else if ( trafficWest == true)
+    {
+      delay(changeDelay);
       digitalWrite(westGreen, LOW);
       digitalWrite(westYellow, HIGH);
       delay(changeDelay);
@@ -80,16 +94,20 @@ void loop()
       digitalWrite(westRed, HIGH);
       delay(changeDelay); //West goes red
 
-      digitalWrite(eastGreen, LOW);
-      digitalWrite(eastYellow, HIGH);
-      delay(changeDelay);
-      digitalWrite(eastYellow, LOW);
-      digitalWrite(eastRed, HIGH);
-      delay(changeDelay);// East goes red
-      digitalWrite(pedLight, HIGH);
-      delay(flowTime);
-      digitalWrite (pedLight, LOW);
 
+
+     
+            
+
+    }
+      digitalWrite(pedLight, HIGH);
+      delay(pedFlowTime);
+      digitalWrite (pedLight, LOW);
+      trafficWest = true;
+      
+      digitalWrite(eastYellow, LOW);
+      digitalWrite(eastRed, LOW);
+      digitalWrite(eastGreen, HIGH); // turn traffic back
   }
   if ( digitalRead(eastButton) == HIGH)
   {
@@ -103,13 +121,6 @@ void loop()
       digitalWrite(westYellow, LOW);
       digitalWrite(westRed, HIGH);
       delay(changeDelay);
-      for ( int a = 0; a < 5; a++)
-      {
-        digitalWrite(eastYellow, LOW);
-        delay(yellowBlinkTime);
-        digitalWrite(eastYellow, HIGH);
-        delay(yellowBlinkTime);
-      }
       digitalWrite(eastYellow, LOW);
       digitalWrite(eastRed, LOW);
       digitalWrite(eastGreen, HIGH);
