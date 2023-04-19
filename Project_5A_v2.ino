@@ -1,8 +1,9 @@
 //**** add 1 button and 1 light
-// Note: Deleted the flash portion because traffic lights dont flash before they change
-//       Additonally, the code was causing a ton of unintended behavior so it got scrapped 
+// Note: Deleted the flash portion because traffic lights dont flash before they change in most applications
+//       Additonally, the code was causing a ton of unintended behavior so it got scrapped
 //       Updated to use more complex logic because apparently functional isn't good enough
 //       Check github https://github.com/ColtonKelsen/Project5Micro2
+//       Warning: do not swap lights too quickly; due to hardware limitations it can cause temporary erratic behavior
 #define westButton 3
 #define eastButton 13
 #define westRed 2
@@ -14,15 +15,14 @@
 #define pedButton 9
 #define pedLight 8
 
-boolean trafficWest = true; // west = true, east = false
-int flowTime = 4000;
-int changeDelay = 1000;
-int pedFlowTime = 4000;
+boolean trafficWest = true;  // west = true, east = false. in v3 This is removed and replaced with a character input to determine function call behaviors
+int flowTime = 10000; // Edited Values for testing purposes
+int changeDelay = 2000; // Edited Values for testing purposes
+int pedFlowTime = 10000; // Edited Values for testing purposes
 
 
 
-void setup()
-{
+void setup() { //Setup 
   pinMode(westButton, INPUT);
   pinMode(eastButton, INPUT);
   pinMode(westRed, OUTPUT);
@@ -31,10 +31,10 @@ void setup()
   pinMode(eastRed, OUTPUT);
   pinMode(eastYellow, OUTPUT);
   pinMode(eastGreen, OUTPUT);
-  pinMode(pedButton, INPUT);
-  pinMode(pedLight, OUTPUT);
-
-
+  pinMode(pedButton, INPUT); //new component
+  pinMode(pedLight, OUTPUT); //new component
+// dictating inputs/outputs ^
+// dictating initial states v
 
   digitalWrite(westRed, LOW);
   digitalWrite(westYellow, LOW);
@@ -44,75 +44,56 @@ void setup()
   digitalWrite(eastGreen, LOW);
 }
 
-void loop()
-{
-  if ( digitalRead(westButton) == HIGH)
-  {
-    if ( trafficWest != true)
-    {
+void loop() { 
+  //start west
+  if (digitalRead(westButton) == HIGH) { // only run when traffic west
+    if (trafficWest != true) { 
       trafficWest = true;
-      delay(flowTime);
+      delay(flowTime); //flow
       digitalWrite(eastGreen, LOW);
-
-      digitalWrite(eastYellow, HIGH);
+      digitalWrite(eastYellow, HIGH); //bring east to yellow
       delay(changeDelay);
       digitalWrite(eastYellow, LOW);
-      digitalWrite(eastRed, HIGH);
+      digitalWrite(eastRed, HIGH); //bring east to red
       delay(changeDelay);
       digitalWrite(westYellow, LOW);
       digitalWrite(westRed, LOW);
-      digitalWrite(westGreen, HIGH);
-
+      digitalWrite(westGreen, HIGH); //activate west
     }
   }
-  if (digitalRead(pedButton) == HIGH)
-  {
-     if ( trafficWest != true)
-    { 
+  //start pedestrian
+  if (digitalRead(pedButton) == HIGH) { 
+    if (trafficWest != true) { //Only run when traffic is east
       delay(changeDelay);
       digitalWrite(eastGreen, LOW);
       digitalWrite(eastYellow, HIGH);
       delay(changeDelay);
       digitalWrite(eastYellow, LOW);
       digitalWrite(eastRed, HIGH);
-      delay(changeDelay);// East goes red
-
-
-
-
-
-
-
-    }
-    else if ( trafficWest == true)
-    {
+      delay(changeDelay);  // East goes red
+    } 
+    else if (trafficWest == true) { //Only run when traffic is west
       delay(changeDelay);
       digitalWrite(westGreen, LOW);
       digitalWrite(westYellow, HIGH);
       delay(changeDelay);
       digitalWrite(westYellow, LOW);
       digitalWrite(westRed, HIGH);
-      delay(changeDelay); //West goes red
-
-
-
-     
-            
-
+      delay(changeDelay);  //West goes red
     }
-      digitalWrite(pedLight, HIGH);
-      delay(pedFlowTime);
-      digitalWrite (pedLight, LOW);
-      trafficWest = true;
-      
-      digitalWrite(eastYellow, LOW);
-      digitalWrite(eastRed, LOW);
-      digitalWrite(eastGreen, HIGH); // turn traffic back
-  }
-  if ( digitalRead(eastButton) == HIGH)
-  {
-    if ( trafficWest == true)
-    {
+      // This code runs regardless of direction    
+    digitalWrite(pedLight, HIGH);
+    delay(pedFlowTime);
+    digitalWrite(pedLight, LOW);
+    trafficWest = true; //west goes firt
+    digitalWrite(eastYellow, LOW);
+    digitalWrite(eastRed, LOW);
+    digitalWrite(eastGreen, HIGH);  // turn traffic back on
+  } 
+  // end pedestrian
+  // start east
+  if (digitalRead(eastButton) == HIGH) { //Only run when traffic is east
+    if (trafficWest == true) {  //
       trafficWest = false;
       delay(flowTime);
       digitalWrite(westGreen, LOW);
@@ -124,9 +105,7 @@ void loop()
       digitalWrite(eastYellow, LOW);
       digitalWrite(eastRed, LOW);
       digitalWrite(eastGreen, HIGH);
-
     }
-
   }
-
 }
+// *Note: trafficWest variable check is implemented to dictate the pedestrian button behavior since double-checking is apparently not good enough.
