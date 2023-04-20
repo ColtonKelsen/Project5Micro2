@@ -71,6 +71,10 @@ void loop() {
       digitalWrite(eastYellow, LOW);
       digitalWrite(eastRed, HIGH);
       delay(changeDelay);  // East goes red
+      digitalWrite(pedLight, HIGH);
+      delay(pedFlowTime);
+      digitalWrite(pedLight, LOW);
+      //trafficWest = true; //west goes first
     } 
     else if (trafficWest == true) { //Only run when traffic is west
       delay(changeDelay);
@@ -80,15 +84,16 @@ void loop() {
       digitalWrite(westYellow, LOW);
       digitalWrite(westRed, HIGH);
       delay(changeDelay);  //West goes red
+      digitalWrite(pedLight, HIGH);
+      delay(pedFlowTime);
+      digitalWrite(pedLight, LOW);
+      //trafficWest = false; //east goes first
     }
-      // This code runs regardless of direction    
-    digitalWrite(pedLight, HIGH);
-    delay(pedFlowTime);
-    digitalWrite(pedLight, LOW);
-    trafficWest = true; //west goes firt
-    digitalWrite(eastYellow, LOW);
-    digitalWrite(eastRed, LOW);
-    digitalWrite(eastGreen, HIGH);  // turn traffic back on
+      delay(changeDelay);
+      digitalWrite(westYellow, LOW);
+      digitalWrite(westRed, LOW);
+      digitalWrite(westGreen, HIGH); //activate west
+      trafficWest = true; //cleanup variable junk
   } 
   // end pedestrian
   // start east
@@ -109,3 +114,4 @@ void loop() {
   }
 }
 // *Note: trafficWest variable check is implemented to dictate the pedestrian button behavior since double-checking is apparently not good enough.
+// known bugs: when swapping from east to pedestrian it trips the west yellow light. assumed to be running both checks
